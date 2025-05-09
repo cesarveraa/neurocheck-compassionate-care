@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -9,14 +8,36 @@ import TrafficLight from "@/components/TrafficLight";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import CognitiveResultsDashboard from "@/components/CognitiveResultsDashboard";
 
-type AppStep = 'welcome' | 'consent' | 'modeSelection' | 'patientData' | 'testPreparation' | 'test';
+type AppStep = 'welcome' | 'consent' | 'modeSelection' | 'patientData' | 'testPreparation' | 'test' | 'results';
+
+// Mock test results for demonstration purposes
+const mockTestResults = {
+  overallScore: 75,
+  responseTime: 3.2,
+  domains: [
+    { name: "Orientación", score: 85, status: "green" as const },
+    { name: "Memoria", score: 70, status: "yellow" as const },
+    { name: "Atención", score: 60, status: "yellow" as const },
+    { name: "Lenguaje", score: 90, status: "green" as const },
+    { name: "Cálculo", score: 45, status: "red" as const },
+  ],
+  timeData: [
+    { timepoint: "P1", value: 2.1 },
+    { timepoint: "P2", value: 3.5 },
+    { timepoint: "P3", value: 4.2 },
+    { timepoint: "P4", value: 2.8 },
+    { timepoint: "P5", value: 3.4 },
+  ]
+};
 
 const Index = () => {
   const [currentStep, setCurrentStep] = useState<AppStep>('welcome');
   const [testMode, setTestMode] = useState<'camera' | 'text'>('text');
   const [consentAccepted, setConsentAccepted] = useState(false);
   const [patientData, setPatientData] = useState<PatientData | null>(null);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
   
   const handleNextStep = (nextStep: AppStep) => {
     setCurrentStep(nextStep);
@@ -29,6 +50,16 @@ const Index = () => {
   const handlePatientDataSubmit = (data: PatientData) => {
     setPatientData(data);
     handleNextStep('testPreparation');
+  };
+
+  const handleQuestionAnswer = () => {
+    if (currentQuestion < 4) {
+      setCurrentQuestion(currentQuestion + 1);
+    } else {
+      // After 5 questions (0-4), go to results
+      setCurrentQuestion(0);
+      handleNextStep('results');
+    }
   };
   
   return (
@@ -256,7 +287,7 @@ const Index = () => {
           </div>
         )}
         
-        {/* Test Screen (Demo) */}
+        {/* Test Screen */}
         {currentStep === 'test' && (
           <div className="flex flex-col items-center justify-center h-full space-y-8 animate-appear">
             <h2 className="text-3xl font-bold gradient-text">Evaluación Cognitiva</h2>
@@ -270,21 +301,100 @@ const Index = () => {
                 </div>
               )}
               
-              <AiMessage 
-                message="¿Qué día de la semana es hoy?" 
-                className="mb-6"
-              />
+              {currentQuestion === 0 && (
+                <AiMessage 
+                  message="¿Qué día de la semana es hoy?" 
+                  className="mb-6"
+                />
+              )}
+              {currentQuestion === 1 && (
+                <AiMessage 
+                  message="¿Puedes recordar estas tres palabras? Casa, Perro, Azul" 
+                  className="mb-6"
+                />
+              )}
+              {currentQuestion === 2 && (
+                <AiMessage 
+                  message="¿En qué año estamos actualmente?" 
+                  className="mb-6"
+                />
+              )}
+              {currentQuestion === 3 && (
+                <AiMessage 
+                  message="¿Puedes restar 7 de 100?" 
+                  className="mb-6"
+                />
+              )}
+              {currentQuestion === 4 && (
+                <AiMessage 
+                  message="¿Recuerdas las tres palabras que te mencioné antes?" 
+                  className="mb-6"
+                />
+              )}
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"].map((day) => (
+                {currentQuestion === 0 && (
+                  ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"].map((day) => (
+                    <Button
+                      key={day}
+                      variant="outline"
+                      className="h-16 text-lg hover:bg-neuro-secondary/20 dark:hover:bg-neuro-primary/20"
+                      onClick={handleQuestionAnswer}
+                    >
+                      {day}
+                    </Button>
+                  ))
+                )}
+                {currentQuestion === 1 && (
                   <Button
-                    key={day}
                     variant="outline"
-                    className="h-16 text-lg hover:bg-neuro-secondary/20 dark:hover:bg-neuro-primary/20"
+                    className="h-16 text-lg col-span-4 hover:bg-neuro-secondary/20 dark:hover:bg-neuro-primary/20"
+                    onClick={handleQuestionAnswer}
                   >
-                    {day}
+                    Listo, las he memorizado
                   </Button>
-                ))}
+                )}
+                {currentQuestion === 2 && (
+                  ["2023", "2024", "2025", "2026"].map((year) => (
+                    <Button
+                      key={year}
+                      variant="outline"
+                      className="h-16 text-lg hover:bg-neuro-secondary/20 dark:hover:bg-neuro-primary/20"
+                      onClick={handleQuestionAnswer}
+                    >
+                      {year}
+                    </Button>
+                  ))
+                )}
+                {currentQuestion === 3 && (
+                  ["93", "94", "95", "97"].map((answer) => (
+                    <Button
+                      key={answer}
+                      variant="outline"
+                      className="h-16 text-lg hover:bg-neuro-secondary/20 dark:hover:bg-neuro-primary/20"
+                      onClick={handleQuestionAnswer}
+                    >
+                      {answer}
+                    </Button>
+                  ))
+                )}
+                {currentQuestion === 4 && (
+                  [
+                    "Casa, Perro, Azul",
+                    "Mesa, Gato, Rojo",
+                    "Casa, Gato, Azul",
+                    "Casa, Perro, Rojo"
+                  ].map((answer) => (
+                    <Button
+                      key={answer}
+                      variant="outline"
+                      className="h-16 text-lg col-span-2 hover:bg-neuro-secondary/20 dark:hover:bg-neuro-primary/20"
+                      onClick={handleQuestionAnswer}
+                    >
+                      {answer}
+                    </Button>
+                  ))
+                )}
               </div>
               
               <div className="mt-8 flex items-center justify-center gap-6">
@@ -313,10 +423,42 @@ const Index = () => {
               </Button>
               
               <Button 
+                onClick={() => handleNextStep('results')}
+                className="flex-1 h-12 bg-neuro-primary hover:bg-neuro-primary/90 text-white"
+              >
+                Finalizar Test
+              </Button>
+            </div>
+          </div>
+        )}
+        
+        {/* Results Screen */}
+        {currentStep === 'results' && (
+          <div className="flex flex-col items-center space-y-8 animate-appear">
+            <h2 className="text-3xl font-bold gradient-text">Resultados de la Evaluación</h2>
+            
+            <AiMessage 
+              message={`Los resultados de ${patientData?.name || 'paciente'} muestran algunas áreas que requieren atención. Revisa el dashboard para más detalles.`}
+              className="mx-auto mb-6"
+            />
+            
+            <div className="w-full">
+              <CognitiveResultsDashboard results={mockTestResults} />
+            </div>
+            
+            <div className="flex gap-4 w-full max-w-md mt-6">
+              <Button 
+                variant="outline"
+                className="flex-1 h-12"
+              >
+                Descargar PDF
+              </Button>
+              
+              <Button 
                 onClick={() => handleNextStep('welcome')}
                 className="flex-1 h-12 bg-neuro-primary hover:bg-neuro-primary/90 text-white"
               >
-                Finalizar Demo
+                Volver al inicio
               </Button>
             </div>
           </div>
