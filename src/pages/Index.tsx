@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -9,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import CognitiveResultsDashboard from "@/components/CognitiveResultsDashboard";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type AppStep = 'welcome' | 'consent' | 'modeSelection' | 'patientData' | 'testPreparation' | 'test' | 'results';
 
@@ -33,6 +36,7 @@ const mockTestResults = {
 };
 
 const Index = () => {
+  const { language, translations } = useLanguage();
   const [currentStep, setCurrentStep] = useState<AppStep>('welcome');
   const [testMode, setTestMode] = useState<'camera' | 'text'>('text');
   const [consentAccepted, setConsentAccepted] = useState(false);
@@ -61,13 +65,18 @@ const Index = () => {
       handleNextStep('results');
     }
   };
+
+  const t = (key: keyof typeof translations) => translations[key][language];
   
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
       <header className="py-4 px-6 flex justify-between items-center border-b border-neuro-secondary/20 dark:border-neuro-primary/20">
         <Logo />
-        <ThemeToggle />
+        <div className="flex items-center gap-3">
+          <LanguageSwitcher />
+          <ThemeToggle />
+        </div>
       </header>
       
       {/* Main content */}
@@ -77,15 +86,15 @@ const Index = () => {
           <div className="flex flex-col items-center justify-center h-full space-y-8 animate-appear">
             <div className="text-center space-y-3 max-w-2xl">
               <h1 className="text-4xl md:text-5xl font-bold mb-6 gradient-text">
-                Bienvenido a NeuroCheck
+                {t('welcome')}
               </h1>
               <AiMessage 
-                message="Hola, estoy aquí para acompañarte en esta evaluación. No te preocupes, es solo una charla tranquila."
+                message={t('intro1')}
                 className="mx-auto"
               />
               <div className="h-4"></div>
               <AiMessage 
-                message="Te ayudaré a detectar signos tempranos de deterioro cognitivo de forma simple y amable."
+                message={t('intro2')}
                 delay={50}
                 className="mx-auto"
               />
@@ -95,7 +104,7 @@ const Index = () => {
               onClick={() => handleNextStep('consent')}
               className="mt-8 h-14 px-8 text-lg bg-neuro-primary hover:bg-neuro-primary/90 text-white"
             >
-              Comenzar
+              {t('start')}
             </Button>
           </div>
         )}
@@ -103,7 +112,7 @@ const Index = () => {
         {/* Consent Screen */}
         {currentStep === 'consent' && (
           <div className="flex flex-col items-center justify-center h-full space-y-8 max-w-2xl mx-auto animate-appear">
-            <h2 className="text-3xl font-bold gradient-text">Consentimiento Informado</h2>
+            <h2 className="text-3xl font-bold gradient-text">{t('consent')}</h2>
             
             <div className="bg-white dark:bg-neuro-neutral/10 rounded-lg p-6 shadow-sm border border-neuro-secondary/20 dark:border-neuro-primary/20 w-full max-h-[400px] overflow-y-auto">
               <h3 className="text-xl font-semibold mb-4">Términos de uso y privacidad</h3>
@@ -150,7 +159,7 @@ const Index = () => {
                 htmlFor="consent" 
                 className="text-base font-medium cursor-pointer"
               >
-                He leído y acepto los términos de uso y política de privacidad
+                {t('consentCheck')}
               </Label>
             </div>
             
@@ -160,7 +169,7 @@ const Index = () => {
                 variant="outline"
                 className="flex-1 h-12"
               >
-                Volver
+                {t('back')}
               </Button>
               
               <Button 
@@ -168,7 +177,7 @@ const Index = () => {
                 disabled={!consentAccepted}
                 className="flex-1 h-12 bg-neuro-primary hover:bg-neuro-primary/90 text-white"
               >
-                Continuar
+                {t('continue')}
               </Button>
             </div>
           </div>
@@ -177,25 +186,25 @@ const Index = () => {
         {/* Mode Selection Screen */}
         {currentStep === 'modeSelection' && (
           <div className="flex flex-col items-center justify-center h-full space-y-8 animate-appear">
-            <h2 className="text-3xl font-bold gradient-text">Selecciona el modo de evaluación</h2>
+            <h2 className="text-3xl font-bold gradient-text">{t('selectMode')}</h2>
             
             <AiMessage 
-              message="Puedes elegir entre realizar la evaluación con cámara o sin ella, según te resulte más cómodo."
+              message={t('modeInfo')}
               className="mx-auto"
             />
             
             <div className="flex flex-col md:flex-row gap-6 mt-8">
               <ModeCard
-                title="Modo con Cámara"
-                description="La IA analizará tus expresiones faciales durante la evaluación"
+                title={t('cameraMode')}
+                description={t('cameraDesc')}
                 isCamera={true}
                 isSelected={testMode === 'camera'}
                 onClick={() => handleModeSelection('camera')}
               />
               
               <ModeCard
-                title="Modo sin Cámara"
-                description="Responde a las preguntas seleccionando opciones en pantalla"
+                title={t('textMode')}
+                description={t('textDesc')}
                 isCamera={false}
                 isSelected={testMode === 'text'}
                 onClick={() => handleModeSelection('text')}
@@ -208,14 +217,14 @@ const Index = () => {
                 variant="outline"
                 className="flex-1 h-12"
               >
-                Volver
+                {t('back')}
               </Button>
               
               <Button 
                 onClick={() => handleNextStep('patientData')}
                 className="flex-1 h-12 bg-neuro-primary hover:bg-neuro-primary/90 text-white"
               >
-                Continuar
+                {t('continue')}
               </Button>
             </div>
           </div>
@@ -224,10 +233,10 @@ const Index = () => {
         {/* Patient Data Screen */}
         {currentStep === 'patientData' && (
           <div className="flex flex-col items-center justify-center h-full space-y-8 animate-appear">
-            <h2 className="text-3xl font-bold gradient-text">Información del Paciente</h2>
+            <h2 className="text-3xl font-bold gradient-text">{t('patientInfo')}</h2>
             
             <AiMessage 
-              message="Por favor, proporciona la información del paciente para personalizar la evaluación."
+              message={t('patientPrompt')}
               className="mx-auto"
             />
             
@@ -238,7 +247,7 @@ const Index = () => {
               variant="outline"
               className="w-full max-w-lg h-12"
             >
-              Volver
+              {t('back')}
             </Button>
           </div>
         )}
@@ -246,11 +255,11 @@ const Index = () => {
         {/* Test Preparation Screen */}
         {currentStep === 'testPreparation' && (
           <div className="flex flex-col items-center justify-center h-full space-y-8 animate-appear">
-            <h2 className="text-3xl font-bold gradient-text">Preparación del Test</h2>
+            <h2 className="text-3xl font-bold gradient-text">{t('testPrep')}</h2>
             
             <div className="text-center">
               <AiMessage 
-                message={`Hola ${patientData?.name || 'paciente'}, vamos a comenzar con tu evaluación en modo ${testMode === 'camera' ? 'con cámara' : 'sin cámara'}.`}
+                message={`${language === 'español' ? 'Hola' : 'Kamisaraki'} ${patientData?.name || (language === 'español' ? 'paciente' : 'usuta')}, ${language === 'español' ? 'vamos a comenzar con tu evaluación en modo' : 'qalltañani aka yant'awi'} ${testMode === 'camera' ? (language === 'español' ? 'con cámara' : 'cámara uñtasa') : (language === 'español' ? 'sin cámara' : 'jan cámara uñtasa')}.`}
                 className="mx-auto mb-6"
               />
               
@@ -258,11 +267,11 @@ const Index = () => {
                 <div className="text-6xl font-bold text-neuro-primary dark:text-neuro-secondary animate-pulse-soft">
                   3
                 </div>
-                <p className="text-lg mt-4">Preparándose para comenzar...</p>
+                <p className="text-lg mt-4">{t('prepTime')}</p>
               </div>
               
               <AiMessage 
-                message="Tómate tu tiempo para responder. Estoy contigo durante todo el proceso."
+                message={t('takeTime')}
                 delay={50}
                 className="mx-auto"
               />
@@ -274,14 +283,14 @@ const Index = () => {
                 variant="outline"
                 className="flex-1 h-12"
               >
-                Volver
+                {t('back')}
               </Button>
               
               <Button 
                 onClick={() => handleNextStep('test')}
                 className="flex-1 h-12 bg-neuro-primary hover:bg-neuro-primary/90 text-white"
               >
-                Iniciar Test
+                {t('startTest')}
               </Button>
             </div>
           </div>
@@ -290,51 +299,52 @@ const Index = () => {
         {/* Test Screen */}
         {currentStep === 'test' && (
           <div className="flex flex-col items-center justify-center h-full space-y-8 animate-appear">
-            <h2 className="text-3xl font-bold gradient-text">Evaluación Cognitiva</h2>
+            <h2 className="text-3xl font-bold gradient-text">{t('cognitiveTest')}</h2>
             
             <div className="w-full max-w-2xl">
               {testMode === 'camera' && (
                 <div className="relative bg-black rounded-lg overflow-hidden aspect-video mx-auto mb-6">
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <p className="text-white">Vista de la cámara (simulada)</p>
+                    <p className="text-white">{language === 'español' ? 'Vista de la cámara (simulada)' : 'Cámara uñtata (simulada)'}</p>
                   </div>
                 </div>
               )}
               
               {currentQuestion === 0 && (
                 <AiMessage 
-                  message="¿Qué día de la semana es hoy?" 
+                  message={language === 'español' ? "¿Qué día de la semana es hoy?" : "¿Kunüri aka semanana?"}
                   className="mb-6"
                 />
               )}
               {currentQuestion === 1 && (
                 <AiMessage 
-                  message="¿Puedes recordar estas tres palabras? Casa, Perro, Azul" 
+                  message={language === 'español' ? "¿Puedes recordar estas tres palabras? Casa, Perro, Azul" : "¿Aka kimsa arunak amtaskismati? Uta, Anu, Larama"}
                   className="mb-6"
                 />
               )}
               {currentQuestion === 2 && (
                 <AiMessage 
-                  message="¿En qué año estamos actualmente?" 
+                  message={language === 'español' ? "¿En qué año estamos actualmente?" : "¿Kuna maratsa jichhasti?"}
                   className="mb-6"
                 />
               )}
               {currentQuestion === 3 && (
                 <AiMessage 
-                  message="¿Puedes restar 7 de 100?" 
+                  message={language === 'español' ? "¿Puedes restar 7 de 100?" : "¿Patakati 7 jark'aqasmati?"}
                   className="mb-6"
                 />
               )}
               {currentQuestion === 4 && (
                 <AiMessage 
-                  message="¿Recuerdas las tres palabras que te mencioné antes?" 
+                  message={language === 'español' ? "¿Recuerdas las tres palabras que te mencioné antes?" : "¿Amtasktati nayra kimsa arunaka?"}
                   className="mb-6"
                 />
               )}
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {currentQuestion === 0 && (
-                  ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"].map((day) => (
+                  (language === 'español' ? ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"] : 
+                  ["Lunisa", "Martisa", "Mirkulisa", "Juywisa", "Wirnisa", "Sawruta", "Tuminka"]).map((day) => (
                     <Button
                       key={day}
                       variant="outline"
@@ -351,7 +361,7 @@ const Index = () => {
                     className="h-16 text-lg col-span-4 hover:bg-neuro-secondary/20 dark:hover:bg-neuro-primary/20"
                     onClick={handleQuestionAnswer}
                   >
-                    Listo, las he memorizado
+                    {language === 'español' ? "Listo, las he memorizado" : "Waliki, amtastwa"}
                   </Button>
                 )}
                 {currentQuestion === 2 && (
@@ -379,12 +389,19 @@ const Index = () => {
                   ))
                 )}
                 {currentQuestion === 4 && (
+                  (language === 'español' ? 
                   [
                     "Casa, Perro, Azul",
                     "Mesa, Gato, Rojo",
                     "Casa, Gato, Azul",
                     "Casa, Perro, Rojo"
-                  ].map((answer) => (
+                  ] : 
+                  [
+                    "Uta, Anu, Larama",
+                    "Misa, Pisi, Chupika",
+                    "Uta, Pisi, Larama",
+                    "Uta, Anu, Chupika"
+                  ]).map((answer) => (
                     <Button
                       key={answer}
                       variant="outline"
@@ -400,15 +417,15 @@ const Index = () => {
               <div className="mt-8 flex items-center justify-center gap-6">
                 <div className="flex flex-col items-center">
                   <TrafficLight status="green" size="lg" />
-                  <span className="mt-2">Correcto</span>
+                  <span className="mt-2">{t('correct')}</span>
                 </div>
                 <div className="flex flex-col items-center">
                   <TrafficLight status="yellow" size="lg" />
-                  <span className="mt-2">Regular</span>
+                  <span className="mt-2">{t('regular')}</span>
                 </div>
                 <div className="flex flex-col items-center">
                   <TrafficLight status="red" size="lg" />
-                  <span className="mt-2">Incorrecto</span>
+                  <span className="mt-2">{t('incorrect')}</span>
                 </div>
               </div>
             </div>
@@ -419,14 +436,14 @@ const Index = () => {
                 variant="outline"
                 className="flex-1 h-12"
               >
-                Volver
+                {t('back')}
               </Button>
               
               <Button 
                 onClick={() => handleNextStep('results')}
                 className="flex-1 h-12 bg-neuro-primary hover:bg-neuro-primary/90 text-white"
               >
-                Finalizar Test
+                {t('finishTest')}
               </Button>
             </div>
           </div>
@@ -435,10 +452,10 @@ const Index = () => {
         {/* Results Screen */}
         {currentStep === 'results' && (
           <div className="flex flex-col items-center space-y-8 animate-appear">
-            <h2 className="text-3xl font-bold gradient-text">Resultados de la Evaluación</h2>
+            <h2 className="text-3xl font-bold gradient-text">{t('results')}</h2>
             
             <AiMessage 
-              message={`Los resultados de ${patientData?.name || 'paciente'} muestran algunas áreas que requieren atención. Revisa el dashboard para más detalles.`}
+              message={translations.resultsDetails[language].replace('{name}', patientData?.name || (language === 'español' ? 'paciente' : 'usuta'))}
               className="mx-auto mb-6"
             />
             
@@ -451,14 +468,14 @@ const Index = () => {
                 variant="outline"
                 className="flex-1 h-12"
               >
-                Descargar PDF
+                {t('downloadPDF')}
               </Button>
               
               <Button 
                 onClick={() => handleNextStep('welcome')}
                 className="flex-1 h-12 bg-neuro-primary hover:bg-neuro-primary/90 text-white"
               >
-                Volver al inicio
+                {t('backToHome')}
               </Button>
             </div>
           </div>
@@ -468,7 +485,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="py-4 px-6 border-t border-neuro-secondary/20 dark:border-neuro-primary/20 text-center">
         <p className="text-sm text-neuro-neutral dark:text-neuro-light/70">
-          © {new Date().getFullYear()} NeuroCheck - Detección temprana de deterioro cognitivo
+          © {new Date().getFullYear()} {t('footer')}
         </p>
       </footer>
     </div>
