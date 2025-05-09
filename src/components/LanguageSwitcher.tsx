@@ -1,5 +1,5 @@
 
-import { Globe } from "lucide-react";
+import { Languages } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { 
   DropdownMenu, 
@@ -16,11 +16,11 @@ const LanguageSwitcher = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
-          <Globe className="h-5 w-5" />
+          <Languages className="h-5 w-5" />
           <span className="sr-only">Cambiar idioma</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="bg-background border border-input">
         <DropdownMenuItem 
           onClick={() => setLanguage("español")}
           className={language === "español" ? "bg-accent" : ""}

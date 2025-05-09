@@ -259,7 +259,7 @@ const Index = () => {
             
             <div className="text-center">
               <AiMessage 
-                message={`${language === 'español' ? 'Hola' : 'Kamisaraki'} ${patientData?.name || (language === 'español' ? 'paciente' : 'usuta')}, ${language === 'español' ? 'vamos a comenzar con tu evaluación en modo' : 'qalltañani aka yant'awi'} ${testMode === 'camera' ? (language === 'español' ? 'con cámara' : 'cámara uñtasa') : (language === 'español' ? 'sin cámara' : 'jan cámara uñtasa')}.`}
+                message={`${language === 'español' ? 'Hola' : 'Kamisaraki'} ${patientData?.name || (language === 'español' ? 'paciente' : 'usuta')}, ${language === 'español' ? 'vamos a comenzar con tu evaluación en modo' : 'qalltañani aka yant\'awi'} ${testMode === 'camera' ? (language === 'español' ? 'con cámara' : 'cámara uñtasa') : (language === 'español' ? 'sin cámara' : 'jan cámara uñtasa')}.`}
                 className="mx-auto mb-6"
               />
               
