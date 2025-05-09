@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -18,6 +19,9 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				sans: ["Poppins", "sans-serif"],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -52,6 +56,17 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				neuro: {
+					black: "#000000",
+					primary: "#5D737E",
+					secondary: "#87BBA2",
+					light: "#F0F7EE", 
+					alert: "#FFF07C",
+					neutral: "#4B4B4B",
+					"red": "#FF6B6B",
+					"yellow": "#FFD166",
+					"green": "#06D6A0"
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -70,25 +85,43 @@ export default {
 			},
 			keyframes: {
 				'accordion-down': {
-					from: {
-						height: '0'
-					},
-					to: {
-						height: 'var(--radix-accordion-content-height)'
-					}
+					from: { height: '0' },
+					to: { height: 'var(--radix-accordion-content-height)' }
 				},
 				'accordion-up': {
-					from: {
-						height: 'var(--radix-accordion-content-height)'
-					},
-					to: {
-						height: '0'
+					from: { height: 'var(--radix-accordion-content-height)' },
+					to: { height: '0' }
+				},
+				'pulse-soft': {
+					'0%, 100%': { opacity: '1' },
+					'50%': { opacity: '0.7' }
+				},
+				'float': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-10px)' }
+				},
+				'ping-small': {
+					'75%, 100%': {
+						transform: 'scale(1.1)',
+						opacity: '0'
 					}
+				},
+				'appear': {
+					'0%': { opacity: '0', transform: 'translateY(20px)' },
+					'100%': { opacity: '1', transform: 'translateY(0)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'pulse-soft': 'pulse-soft 3s infinite ease-in-out',
+				'float': 'float 5s infinite ease-in-out',
+				'ping-small': 'ping-small 2s cubic-bezier(0, 0, 0.2, 1) infinite',
+				'appear': 'appear 0.5s ease-out forwards'
+			},
+			backgroundImage: {
+				'gradient-neuro': 'linear-gradient(135deg, #F0F7EE, #87BBA2)',
+				'gradient-neuro-dark': 'linear-gradient(135deg, #1a1a1a, #2c3e50)'
 			}
 		}
 	},
