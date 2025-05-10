@@ -1,73 +1,68 @@
-# Welcome to your Lovable project
+# 🧠 NeuroCheck – Frontend
 
-## Project info
+**NeuroCheck** es una plataforma web de evaluación cognitiva asistida por IA, diseñada para contextos rurales y urbanos de Bolivia. Este repositorio contiene el frontend de la aplicación, desarrollado con tecnologías modernas y preparado para integrar módulos como reconocimiento por voz, predicción de Alzheimer, Demencia y Deterioro Cognitivo leve mediante lecturas EEG y evaluación en idioma aymara.
 
-**URL**: https://lovable.dev/projects/f08fd7c3-77b5-4eb8-ae83-aafb7b5e9fe8
+---
 
-## How can I edit this code?
+## 🚀 Tecnologías utilizadas
 
-There are several ways of editing your application.
+- [Vite](https://vitejs.dev/) – Bundler ultrarrápido
+- [React](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/) – Interfaz robusta y tipada
+- [Tailwind CSS](https://tailwindcss.com/) – Estilizado utility-first
+- [shadcn/ui](https://ui.shadcn.com/) – Componentes accesibles y personalizables
+- [Firebase](https://firebase.google.com/) – Almacenamiento, Firestore y autenticación (opcional)
+- [FastAPI](https://fastapi.tiangolo.com/) – Backend REST (conectado externamente)
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f08fd7c3-77b5-4eb8-ae83-aafb7b5e9fe8) and start prompting.
+## 🧩 Estructura del proyecto
+📁 src/
+│ ├── components/ # Componentes reutilizables UI
+│ ├── pages/ # Vistas principales
+│ ├── hooks/ # Hooks personalizados (ej. fetch de resultados)
+│ ├── contexts/ # Manejo de idioma, estado global, etc.
+│ ├── assets/ # Recursos estáticos
+│ └── utils/ # Funciones auxiliares
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## 🧪 Funcionalidades clave
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- Registro de pacientes y consentimiento digital
+- Formularios inteligentes para datos demográficos y clínicos
+- Subida de archivos EEG (.set, .edf)
+- Visualización de resultados: Índice de Riesgo Cognitivo (IRC), gráfico semafórico
+- Soporte para idioma **español y aymara**
+- Interacción por voz (Whisper STT + ElevenLabs TTS)
+- Preparado para PWA y despliegue en contextos offline
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+---
+## 🧩 Módulos del Proyecto
 
-Follow these steps:
+| Módulo         | Descripción                                                                                 | Enlace                                                              |
+| -------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| 🧠 Backend API | Servidor FastAPI con endpoints de evaluación, datos clínicos, y LLM                         | [neurocheck-server](https://github.com/Jhuly1215/neurocheck-server) |
+| ⚡ EEG Engine   | Código de preprocesamiento y modelos de IA EEG multimodal                                   | [neurocheck\_eeg](https://github.com/cesarveraa/neurocheck_eeg)     |
+| 💻 Frontend    | (este repositorio) Aplicación web con interfaz conversacional y visualización de resultados | Este repositorio                                                    |
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 📊 Datasets Utilizados
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+El proyecto se desarrolló utilizando múltiples datasets clínicos y lingüísticos, detallados a continuación:
 
-# Step 3: Install the necessary dependencies.
-npm i
+| Dataset                                                                                                     | Descripción                                                                                      |
+|-------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
+| [Alzheimer's Disease Dataset](https://www.kaggle.com/datasets/rabieelkharoua/alzheimers-disease-dataset)   | Datos clínicos de pacientes con enfermedad de Alzheimer.                                         |
+| [Dementia Dataset](https://www.kaggle.com/datasets/fatemehmehrparvar/dementia)                              | Conjunto de datos sobre demencia que incluye varias características clínicas y cognitivas.       |
+| [OpenNeuro EEG - ds004504](https://openneuro.org/datasets/ds004504/versions/1.0.7)                          | Datos EEG públicos para evaluación cognitiva, usado en el módulo de procesamiento de señales EEG.|
+| [Aymara-Spanish Translation Dataset](https://github.com/AmericasNLP/americasnlp2021/tree/main/data/aymara-spanish) | Usado para la traducción al idioma aymara, facilitando la accesibilidad multilingüe del sistema.|
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+## ⚙️ Instalación local
+
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/tuusuario/neurocheck-frontend.git
+cd neurocheck-frontend
+# 2. Instalar dependencias
+npm install
+# 3. Ejecutar el entorno de desarrollo
 npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/f08fd7c3-77b5-4eb8-ae83-aafb7b5e9fe8) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
