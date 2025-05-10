@@ -16,13 +16,15 @@
 ---
 
 ## 🧩 Estructura del proyecto
-📁 src/
-│ ├── components/ # Componentes reutilizables UI
-│ ├── pages/ # Vistas principales
-│ ├── hooks/ # Hooks personalizados (ej. fetch de resultados)
-│ ├── contexts/ # Manejo de idioma, estado global, etc.
-│ ├── assets/ # Recursos estáticos
-│ └── utils/ # Funciones auxiliares
+| Carpeta           | Descripción                                     |
+|-------------------|-------------------------------------------------|
+| `components/`     | 🧩 Componentes reutilizables de UI              |
+| `pages/`          | 📄 Vistas principales                           |
+| `hooks/`          | 🧠 Hooks personalizados (e.g., resultados)      |
+| `contexts/`       | 🌐 Contextos globales (idioma, estado, etc.)    |
+| `assets/`         | 🖼️ Recursos estáticos (imágenes, sonidos, etc.)|
+| `utils/`          | 🧰 Funciones auxiliares                         |
+
 
 ---
 
