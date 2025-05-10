@@ -4,6 +4,12 @@
 
 ---
 
+links:
+backend:
+https://github.com/Jhuly1215/neurocheck-server
+eeg_procesamiento:
+https://github.com/cesarveraa/neurocheck_eeg
+
 ## 🚀 Tecnologías utilizadas
 
 - [Vite](https://vitejs.dev/) – Bundler ultrarrápido
