@@ -1,133 +1,183 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "react-hot-toast";
+import { useQuestions } from "@/hooks/useQuestions";
+import { usePatient } from "@/hooks/usePatient";
+import { useExpectedAnswers } from "@/hooks/useExpectedAnswers";
+import { useLanguage } from "@/contexts/LanguageContext";
 
-interface PatientFormProps {
-  onSubmit: (data: PatientData) => void;
+
+// Al principio del archivo
+export interface PatientData {
+  patient_id?: string; // El ID real generado por backend (opcional si lo crea el servidor)
+  name: string;        // Nombre completo del paciente (obligatorio)
+  [key: string]: any;  // Permite campos dinámicos adicionales
 }
 
-export interface PatientData {
-  name: string;
-  age: number;
-  gender: string;
-  education: string;
-  medicalHistory: string;
+
+interface PatientFormProps {
+  onSubmit?: (data: PatientData) => void;
 }
 
 const PatientForm = ({ onSubmit }: PatientFormProps) => {
-  const [formData, setFormData] = useState<PatientData>({
-    name: "",
-    age: 0,
-    gender: "",
-    education: "",
-    medicalHistory: "",
-  });
+  const { language, translations } = useLanguage();
+  const t = (key: keyof typeof translations) => translations[key][language];
+  const { questions, loading } = useQuestions(language === "español" ? "es" : "ay");
+
+  const { createPatient } = usePatient();
+  const { addExpectedAnswer } = useExpectedAnswers();
+  const [formData, setFormData] = useState<PatientData>({ name: "" });
+
+
+  useEffect(() => {
+    if (!loading && questions.length > 0) {
+      const initial: PatientData = { name: "" };
+      questions.forEach((q) => {
+        if (q.response_type === "boolean") {
+          initial[q.field_name] = false;
+        } else if (q.response_type === "number") {
+          initial[q.field_name] = 0;
+        } else {
+          initial[q.field_name] = "";
+        }
+      });
+      setFormData(initial);
+    }
+  }, [questions, loading]);
   
-  const handleChange = (field: keyof PatientData, value: string | number) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+
+  const handleChange = (field: string, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
-  
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    console.log("[PatientForm] Enviando formulario con datos:", formData);
+  
+    try {
+      const patient = await createPatient({ ...formData });
+      console.log("[PatientForm] Respuesta de createPatient:", patient);
+  
+      const patientId = patient?.patient_id;
+      if (!patientId) {
+        toast.error("No se pudo recuperar el ID del paciente");
+        console.error("[PatientForm] patient_id no retornado por backend.");
+        return;
+      }
+  
+      console.log("[PatientForm] patient_id recuperado:", patientId);
+  
+      for (const q of questions) {
+        console.log(`[PatientForm] Guardando respuesta para pregunta ${q.question_id}:`, formData[q.field_name]);
+        await addExpectedAnswer(patientId, q.question_id, formData[q.field_name]);
+      }
+  
+      toast.success("Respuestas guardadas correctamente");
+      console.log("[PatientForm] Todas las respuestas guardadas correctamente.");
+  
+      if (onSubmit) {
+        console.log("[PatientForm] Llamando a onSubmit con nombre:", formData.name);
+        onSubmit({ name: formData.name });
+      } else {
+        console.warn("[PatientForm] No se pasó onSubmit como prop.");
+      }
+  
+    } catch (err) {
+      console.error("[PatientForm] Error en handleSubmit:", err);
+      toast.error("Error al registrar paciente o respuestas");
+    }
   };
   
+  
+  
+  
+  const renderQuestion = (q: any) => {
+    const val = formData[q.field_name];
+    switch (q.response_type) {
+      case "number":
+        return (
+          <div key={q.question_id} className="space-y-2">
+            <Label>{q.text}</Label>
+            <Input
+              type="number"
+              value={val || ""}
+              onChange={(e) => handleChange(q.field_name, Number(e.target.value))}
+            />
+          </div>
+        );
+      case "boolean":
+        return (
+          <div key={q.question_id} className="space-y-2">
+            <Label>{q.text}</Label>
+            <Select
+              onValueChange={(v) => handleChange(q.field_name, v === "true")}
+              value={val !== undefined ? val.toString() : ""}
+            >
+              <SelectTrigger><SelectValue placeholder="Seleccionar" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="true">{t("yes")}</SelectItem>
+                <SelectItem value="false">{t("no")}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        );
+      case "choice":
+        return (
+          <div key={q.question_id} className="space-y-2">
+            <Label>{q.text}</Label>
+            <Select
+              onValueChange={(v) => handleChange(q.field_name, v)}
+              value={val}
+            >
+              <SelectTrigger><SelectValue placeholder={t("select")} /></SelectTrigger>
+              <SelectContent>
+                {q.options?.map((opt: string) => (
+                  <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        );
+      default:
+        return (
+          <div key={q.question_id} className="space-y-2">
+            <Label>{q.text}</Label>
+            <Input
+              type="text"
+              value={val || ""}
+              onChange={(e) => handleChange(q.field_name, e.target.value)}
+            />
+          </div>
+        );
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-lg mx-auto">
-      <div className="space-y-2">
-        <Label htmlFor="name" className="text-lg">Nombre completo</Label>
+    <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-4xl mx-auto">
+      <div className="space-y-4">
+        <Label>{t("form_name")}</Label>
         <Input
-          id="name"
-          placeholder="Ingrese nombre completo"
           value={formData.name}
           onChange={(e) => handleChange("name", e.target.value)}
-          className="h-12 text-lg bg-white dark:bg-neuro-neutral dark:bg-opacity-10"
           required
         />
       </div>
-      
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="age" className="text-lg">Edad</Label>
-          <Input
-            id="age"
-            type="number"
-            min="0"
-            max="120"
-            placeholder="Edad"
-            value={formData.age || ""}
-            onChange={(e) => handleChange("age", parseInt(e.target.value) || 0)}
-            className="h-12 text-lg bg-white dark:bg-neuro-neutral dark:bg-opacity-10"
-            required
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="gender" className="text-lg">Género</Label>
-          <Select onValueChange={(value) => handleChange("gender", value)}>
-            <SelectTrigger 
-              id="gender"
-              className="h-12 text-lg bg-white dark:bg-neuro-neutral dark:bg-opacity-10"
-            >
-              <SelectValue placeholder="Seleccionar" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="male">Masculino</SelectItem>
-              <SelectItem value="female">Femenino</SelectItem>
-              <SelectItem value="other">Otro</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
+        {questions.map(renderQuestion)}
       </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="education" className="text-lg">Nivel educativo</Label>
-        <Select onValueChange={(value) => handleChange("education", value)}>
-          <SelectTrigger 
-            id="education"
-            className="h-12 text-lg bg-white dark:bg-neuro-neutral dark:bg-opacity-10"
-          >
-            <SelectValue placeholder="Seleccionar nivel educativo" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="none">Sin estudios formales</SelectItem>
-            <SelectItem value="primary">Primaria</SelectItem>
-            <SelectItem value="secondary">Secundaria</SelectItem>
-            <SelectItem value="highschool">Bachillerato</SelectItem>
-            <SelectItem value="university">Universidad</SelectItem>
-            <SelectItem value="postgraduate">Posgrado</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="medicalHistory" className="text-lg">Antecedentes médicos relevantes</Label>
-        <Input
-          id="medicalHistory"
-          placeholder="Enfermedades, medicamentos, etc."
-          value={formData.medicalHistory}
-          onChange={(e) => handleChange("medicalHistory", e.target.value)}
-          className="h-12 text-lg bg-white dark:bg-neuro-neutral dark:bg-opacity-10"
-        />
-      </div>
-      
-      <Button 
-        type="submit" 
-        className="w-full h-14 text-lg bg-neuro-primary hover:bg-neuro-primary/90 text-white"
-      >
-        Continuar
+
+      <Button type="submit" className="w-full h-14 text-lg bg-neuro-primary text-white">
+        Guardar paciente
       </Button>
     </form>
   );
