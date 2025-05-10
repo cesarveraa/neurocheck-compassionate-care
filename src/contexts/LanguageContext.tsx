@@ -129,7 +129,24 @@ const translations = {
   footer: {
     español: "NeuroCheck - Detección temprana de deterioro cognitivo",
     aymara: "NeuroCheck - Jan walt'awi amuya nayraqata katjaña",
-  }
+  },
+  form_name: {
+    español: "Nombre completo del Paciente",
+    aymara: "Usutanakan taqpach sutipa",
+  },
+  yes: {
+    español: "Sí",
+    aymara: "Jisa",
+  },
+  no: {
+    español: "No",
+    aymara: "Janiwa",
+  },
+  select: {
+    español: "Seleccionar",
+    aymara: "Ajlliña",
+  },
+
 };
 
 const LanguageContext = createContext<LanguageContextType>({
