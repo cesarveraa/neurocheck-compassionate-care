@@ -61,12 +61,9 @@ const PatientForm = ({ onSubmit }: PatientFormProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("[PatientForm] Enviando formulario con datos:", formData);
   
     try {
       const patient = await createPatient({ ...formData });
-      console.log("[PatientForm] Respuesta de createPatient:", patient);
-  
       const patientId = patient?.patient_id;
       if (!patientId) {
         toast.error("No se pudo recuperar el ID del paciente");
@@ -74,25 +71,23 @@ const PatientForm = ({ onSubmit }: PatientFormProps) => {
         return;
       }
   
-      console.log("[PatientForm] patient_id recuperado:", patientId);
-  
       for (const q of questions) {
-        console.log(`[PatientForm] Guardando respuesta para pregunta ${q.question_id}:`, formData[q.field_name]);
+       
         await addExpectedAnswer(patientId, q.question_id, formData[q.field_name]);
       }
   
       toast.success("Respuestas guardadas correctamente");
-      console.log("[PatientForm] Todas las respuestas guardadas correctamente.");
+    
   
       if (onSubmit) {
-        console.log("[PatientForm] Llamando a onSubmit con nombre:", formData.name);
+     
         onSubmit({ name: formData.name });
       } else {
-        console.warn("[PatientForm] No se pasó onSubmit como prop.");
+  
       }
   
     } catch (err) {
-      console.error("[PatientForm] Error en handleSubmit:", err);
+      
       toast.error("Error al registrar paciente o respuestas");
     }
   };
