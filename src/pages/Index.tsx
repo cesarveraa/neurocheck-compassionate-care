@@ -11,6 +11,7 @@ import PatientForm, { PatientData } from "@/components/PatientForm";
 import TestPreparation from "@/components/TestPreparation";
 import TestCognitivo from "@/components/Test";
 import CognitiveResultsDashboard from "@/components/CognitiveResultsDashboard";
+import { usePatientTestResults } from "@/hooks/usePatientTestResults";
 
 const mockTestResults = {
   overallScore: 75,
@@ -40,7 +41,8 @@ const Index = () => {
   const [patientData, setPatientData] = useState<PatientData | null>(null);
 
   const t = (key: keyof typeof translations) => translations[key][language];
-
+  const { results: fetchedResults, loading } = usePatientTestResults(patientData?.patient_id ?? null);
+  
   return (
     <div className="min-h-screen flex flex-col">
       <header className="py-4 px-6 flex justify-between items-center border-b border-neuro-secondary/20 dark:border-neuro-primary/20">
@@ -97,7 +99,17 @@ const Index = () => {
             <h2 className="text-3xl font-bold gradient-text">{t('results')}</h2>
             <AiMessage message={translations.resultsDetails[language].replace('{name}', patientData?.name || (language === 'español' ? 'paciente' : 'usuta'))} className="mx-auto mb-6" />
             <div className="w-full">
-              <CognitiveResultsDashboard results={mockTestResults} />
+              <CognitiveResultsDashboard
+                  results={{
+                    cognitive: mockTestResults,
+                    alzheimer: {
+                      diagnosis: "Alzheimer",
+                      probability: 87.5,
+                      risk_level: "Alto",
+                    },
+                  }}
+                />
+
             </div>
             <div className="flex gap-4 w-full max-w-md mt-6">
               <Button variant="outline" className="flex-1 h-12">{t('downloadPDF')}</Button>

@@ -12,8 +12,11 @@ import {
 import { toast } from "react-hot-toast";
 import { useQuestions } from "@/hooks/useQuestions";
 import { usePatient } from "@/hooks/usePatient";
+import { useTestResults, TestResult} from "@/hooks/useTestResults";
 import { useExpectedAnswers } from "@/hooks/useExpectedAnswers";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAlzheimerModel } from "@/hooks/useAlzheimerModel";  
+
 
 
 // Al principio del archivo
@@ -59,41 +62,52 @@ const PatientForm = ({ onSubmit }: PatientFormProps) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const { predictAlzheimer } = useAlzheimerModel();
+  const { saveTestResult } = useTestResults();
+
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     try {
       const patient = await createPatient({ ...formData });
       const patientId = patient?.patient_id;
+
       if (!patientId) {
         toast.error("No se pudo recuperar el ID del paciente");
-        console.error("[PatientForm] patient_id no retornado por backend.");
         return;
       }
-  
+
       for (const q of questions) {
-       
         await addExpectedAnswer(patientId, q.question_id, formData[q.field_name]);
       }
-  
-      toast.success("Respuestas guardadas correctamente");
-    
-  
-      if (onSubmit) {
-     
-        onSubmit({ name: formData.name });
-      } else {
-  
+
+      const predictionAlzheimer = await predictAlzheimer({ ...formData });
+      if (predictionAlzheimer) {
+        const formattedResult: TestResult[] = [
+          {
+            test_type: "alzheimer_model", // <-- literal exacto
+            diagnosis: predictionAlzheimer.diagnóstico as "Alzheimer" | "No Alzheimer",
+            probability: parseFloat(predictionAlzheimer.probabilidad),
+            risk_level: predictionAlzheimer.nivel_de_riesgo as "Bajo" | "Moderado" | "Alto"
+          }
+        ];
+
+        await saveTestResult(patientId, formattedResult);
       }
-  
+
+      toast.success("Paciente y resultados registrados");
+
+      if (onSubmit) {
+        onSubmit({ name: formData.name });
+      }
+
     } catch (err) {
-      
-      toast.error("Error al registrar paciente o respuestas");
+      console.error("[PatientForm] Error general en registro:", err);
+      toast.error("Error general en registro");
     }
   };
-  
-  
-  
+
   
   const renderQuestion = (q: any) => {
     const val = formData[q.field_name];
